@@ -109,7 +109,10 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: INIT_SCRIPT
-          value: ""
+          value: |-
+                  export PATH=$PATH:/opt/whatever
+                  env | grep PATH
+                  echo "PATH OVERRIDE DONE!"
         - name: DELEGATE_DESCRIPTION
           value: ""
         - name: DELEGATE_TAGS
@@ -120,7 +123,24 @@ spec:
           value: "true"
         - name: LOG_STREAMING_SERVICE_URL
           value: "https://app.harness.io/gratis/log-service/"
-
+        volumeMounts:
+        - mountPath: /opt/whatever
+          name: terraform-gabs          
+      initContainers:
+      - image: gacerioni/gabs-tf-immutable-example:v1
+        imagePullPolicy: Always
+        name: gabshack
+        command:
+          - cp
+          - -ra
+          - /opt/gabs-example/.
+          - /opt/temp
+        volumeMounts:
+        - mountPath: /opt/temp
+          name: terraform-gabs
+      volumes:
+      - emptyDir: {}
+        name: terraform-gabs
 ---
 
 apiVersion: v1
