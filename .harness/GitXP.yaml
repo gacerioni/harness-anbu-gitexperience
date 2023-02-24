@@ -1,0 +1,32 @@
+inputSet:
+  name: GitXP
+  identifier: GitXP
+  orgIdentifier: default
+  projectIdentifier: Gabs_Labs
+  pipeline:
+    identifier: Anbu_Demo
+    stages:
+      - stage:
+          identifier: Deploy_to_DEV
+          type: Deployment
+          spec:
+            service:
+              serviceInputs:
+                serviceDefinition:
+                  type: Kubernetes
+                  spec:
+                    artifacts:
+                      primary:
+                        primaryArtifactRef: anbu-demo-springboot
+                        sources:
+                          - identifier: anbu-demo-springboot
+                            type: DockerRegistry
+                            spec:
+                              tag: <+input>
+    properties:
+      ci:
+        codebase:
+          build:
+            type: branch
+            spec:
+              branch: main
