@@ -28,7 +28,7 @@ pipeline:
             steps:
               - step:
                   type: RunTests
-                  name: Run Tests
+                  name: Run and Build
                   identifier: Run_Tests
                   spec:
                     connectorRef: account.harnessImage
