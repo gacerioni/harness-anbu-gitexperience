@@ -14,7 +14,6 @@ pipeline:
     - stage:
         name: Java Build
         identifier: Java_Build
-        description: ""
         type: CI
         spec:
           caching:
@@ -72,7 +71,6 @@ pipeline:
                       - name: gitBranch
                   when:
                     stageStatus: Success
-                    condition: 1==2
                   failureStrategies: []
               - step:
                   type: Run
@@ -125,6 +123,9 @@ pipeline:
                     tags:
                       - latest
                       - <+pipeline.variables.tag>
+        when:
+          pipelineStatus: Success
+          condition: 1 == 2
     - stage:
         name: Integration Tests
         identifier: Integration_Tests
