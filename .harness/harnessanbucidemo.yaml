@@ -75,6 +75,49 @@ pipeline:
                     tags:
                       - latest
                       - <+pipeline.variables.tag>
+    - stage:
+        name: Integration Tests
+        identifier: Integration_Tests
+        type: CI
+        spec:
+          cloneCodebase: false
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Background
+                  name: Start and expose the APP
+                  identifier: Start_and_expose_the_APP
+                  spec:
+                    connectorRef: account.harnessImage
+                    image: <+pipeline.variables.DockerHub_User>/<+pipeline.variables.DockerHub_Repo>:<+pipeline.variables.tag>
+                    shell: Sh
+                    portBindings:
+                      "8080": "8080"
+                    imagePullPolicy: IfNotPresent
+              - step:
+                  type: Run
+                  name: Test from HOST
+                  identifier: Test_from_HOST
+                  spec:
+                    shell: Bash
+                    command: |-
+                      sleep 10  
+                      curl localhost:8080
+              - step:
+                  type: Run
+                  name: Test from Container
+                  identifier: Test_from_Container
+                  spec:
+                    connectorRef: account.harnessImage
+                    image: yauritux/busybox-curl
+                    shell: Sh
+                    command: curl Start_and_expose_the_APP:8080
   variables:
     - name: DockerHub_User
       type: String
