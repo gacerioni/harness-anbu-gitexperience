@@ -92,7 +92,7 @@ pipeline:
               - step:
                   type: Background
                   name: Start and expose the APP
-                  identifier: Start_and_expose_the_APP
+                  identifier: myappservice
                   spec:
                     connectorRef: account.harnessImage
                     image: <+pipeline.variables.DockerHub_User>/<+pipeline.variables.DockerHub_Repo>:<+pipeline.variables.tag>
