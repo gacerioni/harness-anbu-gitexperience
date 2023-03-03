@@ -54,7 +54,9 @@ pipeline:
                       echo "Who am I at runtime"
                       whoami
                       echo "printing output path:"
-                      find /tmp/engine/ -name *.out
+                      find / -name *.out
+
+                      ls -ltra /tmp/engine/*
 
 
                       #export release="<+codebase.branch>-$version-<+codebase.commitSha>"
