@@ -65,3 +65,8 @@ pipeline:
                     outputVariables: []
                   timeout: 10s
         tags: {}
+  variables:
+    - name: DockerHub_User
+      type: String
+      description: ""
+      value: <+input>
