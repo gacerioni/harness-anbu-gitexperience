@@ -53,6 +53,8 @@ pipeline:
                       ls -ltra
                       echo "Who am I at runtime"
                       whoami
+                      echo "printing output path:"
+                      ls -ltr /tmp/engine/
 
 
                       #export release="<+codebase.branch>-$version-<+codebase.commitSha>"
