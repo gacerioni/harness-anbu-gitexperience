@@ -46,3 +46,22 @@ pipeline:
                       spec:
                         paths:
                           - "**/*.xml"
+    - stage:
+        name: Other Tests
+        identifier: Other_Tests
+        description: ""
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: Http
+                  name: HTTP
+                  identifier: HTTP
+                  spec:
+                    url: https://app.harness.io
+                    method: GET
+                    headers: []
+                    outputVariables: []
+                  timeout: 10s
+        tags: {}
