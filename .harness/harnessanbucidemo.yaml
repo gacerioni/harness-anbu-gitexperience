@@ -53,10 +53,10 @@ pipeline:
                       ls -ltra
                       echo "Who am I at runtime"
                       whoami
-                      echo "printing output path:"
-                      find / -name *.out
+                      #echo "printing output path:"
+                      #find / -name *.out
 
-                      ls -ltra /tmp/engine/*
+                      #ls -ltra /tmp/engine/*
 
 
                       #export release="<+codebase.branch>-$version-<+codebase.commitSha>"
@@ -65,11 +65,6 @@ pipeline:
                       spec:
                         paths:
                           - "**/*.xml"
-                    outputVariables:
-                      - name: release
-                      - name: version
-                      - name: commitHash
-                      - name: gitBranch
               - step:
                   type: BuildAndPushDockerRegistry
                   name: Build and Push an image to Docker Registry_1
