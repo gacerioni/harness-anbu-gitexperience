@@ -87,4 +87,4 @@ pipeline:
     - name: tag
       type: String
       description: ""
-      value: 1.8.0
+      value: 1.9.0
