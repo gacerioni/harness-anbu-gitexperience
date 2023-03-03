@@ -168,7 +168,7 @@ pipeline:
                     connectorRef: account.harnessImage
                     image: yauritux/busybox-curl
                     shell: Sh
-                    command: curl -i http://tart_and_expose_the_APP:8080
+                    command: curl -i http://myappservice:8080
   variables:
     - name: DockerHub_User
       type: String
