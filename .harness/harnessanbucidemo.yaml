@@ -39,26 +39,22 @@ pipeline:
                     args: clean test
                     packages: com.gabsthecreator
                     runOnlySelectedTests: true
-                    preCommand: |-
+                    postCommand: |-
+                      mvn package -DskipTests
+
+
                       export version=`mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout -Dmaven.repo.local=$PROJ_DIR/.m2/repository`
                       export release="$version"
                       export commitHash=<+codebase.commitSha>
                       export gitBranch=<+codebase.branch>
-                    postCommand: |-
-                      mvn package -DskipTests
 
                       echo "printing current dir"
                       pwd
                       ls -ltra
                       echo "Who am I at runtime"
                       whoami
-                      #echo "printing output path:"
-                      #find / -name *.out
 
-                      #ls -ltra /tmp/engine/*
-
-
-                      #export release="<+codebase.branch>-$version-<+codebase.commitSha>"
+                      ls -ltra /tmp/engine
                     reports:
                       type: JUnit
                       spec:
