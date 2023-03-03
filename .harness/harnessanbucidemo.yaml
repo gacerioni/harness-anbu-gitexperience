@@ -40,13 +40,13 @@ pipeline:
                     args: clean test
                     packages: com.gabsthecreator
                     runOnlySelectedTests: true
-                    postCommand: |-
-                      mvn package -DskipTests
-
+                    preCommand: |-
                       export version=`mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout -Dmaven.repo.local=$PROJ_DIR/.m2/repository`
                       export release="$version"
                       export commitHash=<+codebase.commitSha>
                       export gitBranch=<+codebase.branch>
+                    postCommand: |-
+                      mvn package -DskipTests
 
                       echo "printing current dir"
                       pwd
