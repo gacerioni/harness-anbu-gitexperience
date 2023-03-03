@@ -125,7 +125,7 @@ pipeline:
                       - <+pipeline.variables.tag>
         when:
           pipelineStatus: Success
-          condition: 1 == 2
+          condition: 1 == 1
     - stage:
         name: Integration Tests
         identifier: Integration_Tests
