@@ -464,7 +464,7 @@ pipeline:
         variables: []
         when:
           pipelineStatus: Success
-          condition: 1 == 1
+          condition: 1 == 0
   properties:
     ci:
       codebase:
