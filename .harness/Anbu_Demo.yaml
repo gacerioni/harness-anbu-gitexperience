@@ -141,6 +141,28 @@ pipeline:
                           - latest
                           - <+pipeline.variables.tag>
                         optimize: true
+              - stepGroup:
+                  name: Helm Chart Package
+                  identifier: Helm_Chart_Package
+                  steps:
+                    - step:
+                        type: Run
+                        name: Create Helm Chart Package
+                        identifier: Create_Helm_Chart_Package
+                        spec:
+                          connectorRef: account.Gabs_DockerHub_Registry
+                          image: dtzar/helm-kubectl
+                          shell: Sh
+                          command: |-
+                            helm create gabs
+                            helm package gabs
+
+                            echo "location"
+                            pwd
+
+                            echo "listing directory"
+                            ls -ltr
+                          imagePullPolicy: IfNotPresent
           sharedPaths:
             - /var/run
           serviceDependencies:
