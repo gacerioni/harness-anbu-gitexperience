@@ -24,6 +24,38 @@ pipeline:
               os: Linux
           execution:
             steps:
+              - stepGroup:
+                  name: Helm Chart Package
+                  identifier: Helm_Chart_Package
+                  steps:
+                    - step:
+                        type: Run
+                        name: Create Helm Chart Package
+                        identifier: Create_Helm_Chart_Package
+                        spec:
+                          connectorRef: account.Gabs_DockerHub_Registry
+                          image: dtzar/helm-kubectl
+                          shell: Sh
+                          command: |-
+                            helm create gabs
+                            helm package gabs
+
+                            echo "location"
+                            pwd
+
+                            echo "listing directory"
+                            ls -ltr
+                          imagePullPolicy: IfNotPresent
+                    - step:
+                        type: ArtifactoryUpload
+                        name: Upload Helm Chart to JFrog
+                        identifier: Upload_Helm_Chart_to_JFrog
+                        spec:
+                          connectorRef: Harness_Artifactory
+                          target: citilab-helm-icg-prod/
+                          sourcePath: gabs-0.1.0.tgz
+                type: StepGroup
+                nodeType: StepGroup
               - step:
                   type: RestoreCacheGCS
                   name: Restore Cache
@@ -141,36 +173,6 @@ pipeline:
                           - latest
                           - <+pipeline.variables.tag>
                         optimize: true
-              - stepGroup:
-                  name: Helm Chart Package
-                  identifier: Helm_Chart_Package
-                  steps:
-                    - step:
-                        type: Run
-                        name: Create Helm Chart Package
-                        identifier: Create_Helm_Chart_Package
-                        spec:
-                          connectorRef: account.Gabs_DockerHub_Registry
-                          image: dtzar/helm-kubectl
-                          shell: Sh
-                          command: |-
-                            helm create gabs
-                            helm package gabs
-
-                            echo "location"
-                            pwd
-
-                            echo "listing directory"
-                            ls -ltr
-                          imagePullPolicy: IfNotPresent
-                    - step:
-                        type: ArtifactoryUpload
-                        name: Upload Helm Chart to JFrog
-                        identifier: Upload_Helm_Chart_to_JFrog
-                        spec:
-                          connectorRef: Harness_Artifactory
-                          target: citilab-helm-icg-prod/
-                          sourcePath: gabs-0.1.0.tgz
           sharedPaths:
             - /var/run
           serviceDependencies:
