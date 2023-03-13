@@ -163,6 +163,14 @@ pipeline:
                             echo "listing directory"
                             ls -ltr
                           imagePullPolicy: IfNotPresent
+                    - step:
+                        type: ArtifactoryUpload
+                        name: Upload Helm Chart to JFrog
+                        identifier: Upload_Helm_Chart_to_JFrog
+                        spec:
+                          connectorRef: Harness_Artifactory
+                          target: citilab-helm-icg-prod/
+                          sourcePath: gabs-0.1.0.tgz
           sharedPaths:
             - /var/run
           serviceDependencies:
