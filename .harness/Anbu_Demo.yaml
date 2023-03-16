@@ -356,6 +356,7 @@ pipeline:
                             sensitivity: LOW
                             duration: 5m
                             deploymentTag: <+serviceConfig.artifacts.primary.tag>
+                          isMultiServicesOrEnvs: false
                         timeout: 2h
                         failureStrategies:
                           - onFailure:
@@ -378,6 +379,9 @@ pipeline:
                                   onTimeout:
                                     action:
                                       type: Ignore
+                        when:
+                          stageStatus: Success
+                          condition: 1 == 0
                     - step:
                         name: Canary Delete
                         identifier: canaryDelete
