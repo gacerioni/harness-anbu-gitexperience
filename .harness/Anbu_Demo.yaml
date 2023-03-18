@@ -460,7 +460,7 @@ pipeline:
         variables: []
         when:
           pipelineStatus: Success
-          condition: 1 == 0
+          condition: 1 == 1
   properties:
     ci:
       codebase:
