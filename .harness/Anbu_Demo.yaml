@@ -380,13 +380,6 @@ pipeline:
                             spec:
                               skipDryRun: false
                         - step:
-                            type: Barrier
-                            name: Wait Rolling
-                            identifier: Wait_Rolling
-                            spec:
-                              barrierRef: barriergabs
-                            timeout: 10m
-                        - step:
                             type: JiraUpdate
                             name: ITSM - Close Change
                             identifier: ITSM_Close_Change
@@ -405,13 +398,6 @@ pipeline:
                       identifier: Integration
                       steps:
                         - step:
-                            type: Barrier
-                            name: After-Rolling
-                            identifier: AfterRolling
-                            spec:
-                              barrierRef: barriergabs
-                            timeout: 10m
-                        - step:
                             type: Http
                             name: Health Check - Actuator
                             identifier: Health_Check_Actuator
@@ -427,7 +413,7 @@ pipeline:
                                   errors:
                                     - AllErrors
                                   action:
-                                    type: MarkAsSuccess
+                                    type: MarkAsFailure
             rollbackSteps:
               - step:
                   type: JiraUpdate
