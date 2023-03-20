@@ -145,6 +145,7 @@ pipeline:
             - /var/run
         when:
           pipelineStatus: Success
+          condition: 1 == 0
     - stage:
         name: Deploy to DEV
         identifier: Deploy_to_DEV
