@@ -71,8 +71,8 @@ pipeline:
                             root_dir: gacerioni/IaC-Terraform-Gabs
                             vars:
                               region: sa-east-1
-                              global_access_key: <+secrets.getValue("account.aws_tf_accesskey")>
-                              global_secret_key: <+secrets.getValue("account.aws_tf_secretkey")>
+                              global_access_key: <+secrets.getValue('account.aws_tf_accesskey')>
+                              global_secret_key: <+secrets.getValue('account.aws_tf_secretkey')>
                               bucket_prefix: cicert-gabs
                               acl: private
               - step:
