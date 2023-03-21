@@ -28,6 +28,15 @@ pipeline:
           execution:
             steps:
               - step:
+                  type: Plugin
+                  name: Create S3 Terraform
+                  identifier: Create_S3_Terraform
+                  spec:
+                    connectorRef: account.harnessImage
+                    image: jmccann/drone-terraform
+                    settings:
+                      plan: "false"
+              - step:
                   type: RunTests
                   name: Run and Build
                   identifier: Run_Tests
