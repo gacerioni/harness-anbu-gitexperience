@@ -49,6 +49,7 @@ pipeline:
                         spec:
                           connectorRef: account.harnessImage
                           image: gacerioni/fakedrone:1
+                          imagePullPolicy: Always
                     - step:
                         type: Plugin
                         name: Create S3 Terraform
