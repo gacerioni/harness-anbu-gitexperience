@@ -27,21 +27,43 @@ pipeline:
             spec: {}
           execution:
             steps:
-              - step:
-                  type: Plugin
-                  name: Create S3 Terraform
-                  identifier: Create_S3_Terraform
-                  spec:
-                    connectorRef: account.harnessImage
-                    image: jmccann/drone-terraform
-                    settings:
-                      plan: "false"
-                      vars:
-                        region: sa-east-1
-                        global_access_key: <+secret.getValue('account.aws_tf_accesskey')>
-                        global_secret_key: <+secret.getValue('account.aws_tf_secretkey')>
-                        bucket_prefix: cicert-gabs
-                        acl: private
+              - stepGroup:
+                  name: IaC
+                  identifier: IaC
+                  steps:
+                    - step:
+                        type: GitClone
+                        name: Clone TF
+                        identifier: Clone_TF
+                        spec:
+                          connectorRef: account.Github
+                          repoName: gacerioni/IaC-Terraform-Gabs
+                          build:
+                            type: branch
+                            spec:
+                              branch: simple-s3-creator
+                    - step:
+                        type: Run
+                        name: Run_1
+                        identifier: Run_1
+                        spec:
+                          shell: Sh
+                          command: ls -ltr ./*
+                    - step:
+                        type: Plugin
+                        name: Create S3 Terraform
+                        identifier: Create_S3_Terraform
+                        spec:
+                          connectorRef: account.harnessImage
+                          image: jmccann/drone-terraform
+                          settings:
+                            plan: "false"
+                            vars:
+                              region: sa-east-1
+                              global_access_key: <+secret.getValue('account.aws_tf_accesskey')>
+                              global_secret_key: <+secret.getValue('account.aws_tf_secretkey')>
+                              bucket_prefix: cicert-gabs
+                              acl: private
               - step:
                   type: RunTests
                   name: Run and Build
