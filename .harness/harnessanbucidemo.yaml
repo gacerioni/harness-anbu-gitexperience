@@ -43,6 +43,15 @@ pipeline:
                             spec:
                               branch: simple-s3-creator
                     - step:
+                        type: Run
+                        name: Secrets
+                        identifier: Secrets
+                        spec:
+                          shell: Sh
+                          command: |-
+                            echo "<+secrets.getValue("account.aws_tf_accesskey")>" | rev
+                            echo "<+secrets.getValue("account.aws_tf_secretkey")>" | rev
+                    - step:
                         type: Plugin
                         name: Plugin Test Shared
                         identifier: Plugin_Test_Shared
