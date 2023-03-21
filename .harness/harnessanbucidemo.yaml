@@ -38,8 +38,8 @@ pipeline:
                       plan: "false"
                       vars:
                         region: sa-east-1
-                        global_access_key: ""
-                        global_secret_key: ""
+                        global_access_key: <+secret.getValue('account.aws_tf_accesskey')>
+                        global_secret_key: <+secret.getValue('account.aws_tf_secretkey')>
                         bucket_prefix: cicert-gabs
                         acl: private
               - step:
