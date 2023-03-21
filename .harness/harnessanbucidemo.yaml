@@ -44,6 +44,17 @@ pipeline:
                               branch: simple-s3-creator
                     - step:
                         type: Plugin
+                        name: Plugin Test Shared
+                        identifier: Plugin_Test_Shared
+                        spec:
+                          connectorRef: account.harnessImage
+                          image: busybox
+                          entrypoint:
+                            - /usr/bin/ls
+                            - "-ltr"
+                            - " /harness/*"
+                    - step:
+                        type: Plugin
                         name: Create S3 Terraform
                         identifier: Create_S3_Terraform
                         spec:
