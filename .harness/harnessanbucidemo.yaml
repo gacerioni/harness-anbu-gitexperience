@@ -43,6 +43,13 @@ pipeline:
                             spec:
                               branch: simple-s3-creator
                     - step:
+                        type: Run
+                        name: mkdir
+                        identifier: mkdir
+                        spec:
+                          shell: Sh
+                          command: mkdir bananas
+                    - step:
                         type: Plugin
                         name: Plugin Test Shared
                         identifier: Plugin_Test_Shared
