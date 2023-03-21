@@ -36,6 +36,12 @@ pipeline:
                     image: jmccann/drone-terraform
                     settings:
                       plan: "false"
+                      vars:
+                        region: sa-east-1
+                        global_access_key: ""
+                        global_secret_key: ""
+                        bucket_prefix: cicert-gabs
+                        acl: private
               - step:
                   type: RunTests
                   name: Run and Build
