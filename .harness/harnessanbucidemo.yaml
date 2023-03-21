@@ -48,11 +48,7 @@ pipeline:
                         identifier: Plugin_Test_Shared
                         spec:
                           connectorRef: account.harnessImage
-                          image: busybox
-                          entrypoint:
-                            - /usr/bin/ls
-                            - "-ltr"
-                            - " /harness/*"
+                          image: gacerioni/fakedrone:1
                     - step:
                         type: Plugin
                         name: Create S3 Terraform
