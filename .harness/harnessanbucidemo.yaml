@@ -74,16 +74,11 @@ pipeline:
                                 type: Retry
                                 spec:
                                   retryCount: 3
-                                  retryIntervals:
-                                    - 15m
                                   onRetryFailure:
                                     action:
-                                      type: ManualIntervention
-                                      spec:
-                                        timeout: 3h
-                                        onTimeout:
-                                          action:
-                                            type: MarkAsFailure
+                                      type: MarkAsFailure
+                                  retryIntervals:
+                                    - 15m
               - step:
                   type: RunTests
                   name: Run and Build
