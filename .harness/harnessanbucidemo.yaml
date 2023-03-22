@@ -79,7 +79,7 @@ pipeline:
                                     action:
                                       type: MarkAsFailure
                                   retryIntervals:
-                                    - 15m
+                                    - 5s
               - step:
                   type: RunTests
                   name: Run and Build
