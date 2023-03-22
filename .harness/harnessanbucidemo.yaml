@@ -70,6 +70,7 @@ pipeline:
                           - onFailure:
                               errors:
                                 - Timeout
+                                - Unknown
                               action:
                                 type: Retry
                                 spec:
