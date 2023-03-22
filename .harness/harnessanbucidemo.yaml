@@ -66,6 +66,24 @@ pipeline:
                               global_secret_key: <+secrets.getValue('account.aws_tf_secretkey')>
                               bucket_prefix: cicert-gabs
                               acl: private
+                        failureStrategies:
+                          - onFailure:
+                              errors:
+                                - Timeout
+                              action:
+                                type: Retry
+                                spec:
+                                  retryCount: 3
+                                  retryIntervals:
+                                    - 15m
+                                  onRetryFailure:
+                                    action:
+                                      type: ManualIntervention
+                                      spec:
+                                        timeout: 3h
+                                        onTimeout:
+                                          action:
+                                            type: MarkAsFailure
               - step:
                   type: RunTests
                   name: Run and Build
