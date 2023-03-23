@@ -210,7 +210,7 @@ pipeline:
 
                             export JAVA_HOME=/usr/lib/jvm/temurin-17-jdk-amd64
                           postCommand: |-
-                            mvn package -DskipTests
+                            #mvn package -DskipTests
 
 
                             echo "printing current dir"
