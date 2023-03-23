@@ -95,7 +95,7 @@ pipeline:
                         identifier: Save_Lab_Folder
                         spec:
                           connectorRef: AWS
-                          region: sa-east-1
+                          region: us-east-1
                           bucket: gacerioni-bucket
                           key: savelabfolder
                           sourcePaths:
@@ -168,6 +168,20 @@ pipeline:
             spec: {}
           execution:
             steps:
+              - stepGroup:
+                  name: Restore Lab Cache
+                  identifier: Restore_Lab_Cache
+                  steps:
+                    - step:
+                        type: RestoreCacheS3
+                        name: Restore
+                        identifier: Restore
+                        spec:
+                          connectorRef: AWS
+                          region: us-east-1
+                          bucket: gacerioni-bucket
+                          key: savelabfolder
+                          archiveFormat: Tar
               - step:
                   type: Background
                   name: Start and expose the APP
