@@ -186,7 +186,12 @@ pipeline:
                         identifier: mvn_version
                         spec:
                           shell: Sh
-                          command: mvn -version
+                          command: |-
+                            mvn -version
+
+                            echo ""
+
+                            env | grep JAVA
                     - step:
                         type: RunTests
                         name: Test and Build
