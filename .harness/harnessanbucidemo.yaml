@@ -85,6 +85,22 @@ pipeline:
                     condition: 1 == 0
                   failureStrategies: []
                   spec: {}
+              - stepGroup:
+                  name: Save Lab Cache
+                  identifier: Save_Lab_Cache
+                  steps:
+                    - step:
+                        type: SaveCacheS3
+                        name: Save Lab Folder
+                        identifier: Save_Lab_Folder
+                        spec:
+                          connectorRef: AWS
+                          region: sa-east-1
+                          bucket: gacerioni-bucket
+                          key: savelabfolder
+                          sourcePaths:
+                            - /harness/save-lab-folder
+                          archiveFormat: Tar
               - step:
                   type: RunTests
                   name: Run and Build
