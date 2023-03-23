@@ -80,6 +80,11 @@ pipeline:
                                       type: MarkAsFailure
                                   retryIntervals:
                                     - 5s
+                  when:
+                    stageStatus: Success
+                    condition: 1 == 0
+                  failureStrategies: []
+                  spec: {}
               - step:
                   type: RunTests
                   name: Run and Build
