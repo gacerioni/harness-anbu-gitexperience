@@ -101,8 +101,10 @@ pipeline:
                           shell: Sh
                           command: |-
                             pwd
+                            echo ""
                             ls -ltr ./*
-                            pwd
+                            echo ""
+                            tree
                     - step:
                         type: Run
                         name: caching-intelligence
