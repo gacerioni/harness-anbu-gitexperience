@@ -122,33 +122,6 @@ pipeline:
 
                             echo gabs > gabs.txt
               - stepGroup:
-                  name: Save Lab Cache
-                  identifier: Save_Lab_Cache
-                  steps:
-                    - step:
-                        type: Run
-                        name: Create Lab Data
-                        identifier: Create_Lab_Data
-                        spec:
-                          shell: Sh
-                          command: |-
-                            mkdir save-lab-folder
-                            cd save-lab-folder
-
-                            echo "banana" > bart.txt
-                    - step:
-                        type: SaveCacheS3
-                        name: Save Lab Folder
-                        identifier: Save_Lab_Folder
-                        spec:
-                          connectorRef: AWS
-                          region: us-east-1
-                          bucket: gacerioni-bucket
-                          key: savelabfolder
-                          sourcePaths:
-                            - /harness/save-lab-folder
-                          archiveFormat: Tar
-              - stepGroup:
                   name: Build with Cache
                   identifier: Build_with_Cache
                   steps:
@@ -270,43 +243,6 @@ pipeline:
             spec: {}
           execution:
             steps:
-              - stepGroup:
-                  name: Restore Lab Cache
-                  identifier: Restore_Lab_Cache
-                  steps:
-                    - step:
-                        type: Run
-                        name: tree before
-                        identifier: tree_before
-                        spec:
-                          shell: Sh
-                          command: tree
-                    - step:
-                        type: RestoreCacheS3
-                        name: Restore
-                        identifier: Restore
-                        spec:
-                          connectorRef: AWS
-                          region: us-east-1
-                          bucket: gacerioni-bucket
-                          key: savelabfolder
-                          archiveFormat: Tar
-                    - step:
-                        type: Run
-                        name: tree after
-                        identifier: tree_after
-                        spec:
-                          shell: Sh
-                          command: tree
-                    - step:
-                        type: Run
-                        name: tree after in container
-                        identifier: tree_after_in_container
-                        spec:
-                          connectorRef: account.harnessImage
-                          image: busybox
-                          shell: Sh
-                          command: tree
               - step:
                   type: Background
                   name: Start and expose the APP
