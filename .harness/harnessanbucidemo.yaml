@@ -138,47 +138,61 @@ pipeline:
                           sourcePaths:
                             - /harness/save-lab-folder
                           archiveFormat: Tar
-              - step:
-                  type: RunTests
-                  name: Run and Build
-                  identifier: Run_Tests
-                  spec:
-                    connectorRef: account.harnessImage
-                    image: maven:3.8.6-openjdk-18
-                    language: Java
-                    buildTool: Maven
-                    args: clean test
-                    packages: com.gabsthecreator
-                    runOnlySelectedTests: true
-                    preCommand: |-
-                      export version=`mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout -Dmaven.repo.local=$PROJ_DIR/.m2/repository`
-                      export release="$version"
-                      export commitHash=<+codebase.commitSha>
-                      export gitBranch=<+codebase.branch>
-                    postCommand: |-
-                      mvn package -DskipTests
+              - stepGroup:
+                  name: Build with Cache
+                  identifier: Build_with_Cache
+                  steps:
+                    - step:
+                        type: RestoreCacheS3
+                        name: Restore Maven Repo
+                        identifier: Restore_Maven_Repo
+                        spec:
+                          connectorRef: AWS
+                          region: us-east-1
+                          bucket: gacerioni-bucket
+                          key: mavenrepo
+                          archiveFormat: Tar
+                    - step:
+                        type: RunTests
+                        name: Run and Build
+                        identifier: Run_Tests
+                        spec:
+                          connectorRef: account.harnessImage
+                          image: maven:3.8.6-openjdk-18
+                          language: Java
+                          buildTool: Maven
+                          args: clean test
+                          packages: com.gabsthecreator
+                          runOnlySelectedTests: true
+                          preCommand: |-
+                            export version=`mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout -Dmaven.repo.local=$PROJ_DIR/.m2/repository`
+                            export release="$version"
+                            export commitHash=<+codebase.commitSha>
+                            export gitBranch=<+codebase.branch>
+                          postCommand: |-
+                            mvn package -DskipTests
 
 
-                      echo "printing current dir"
-                      pwd
-                      ls -ltra
-                      echo "Who am I at runtime"
-                      whoami
+                            echo "printing current dir"
+                            pwd
+                            ls -ltra
+                            echo "Who am I at runtime"
+                            whoami
 
-                      ls -ltra /tmp/engine
-                    reports:
-                      type: JUnit
-                      spec:
-                        paths:
-                          - "**/*.xml"
-                    outputVariables:
-                      - name: version
-                      - name: release
-                      - name: commitHash
-                      - name: gitBranch
-                  when:
-                    stageStatus: Success
-                  failureStrategies: []
+                            ls -ltra /tmp/engine
+                          reports:
+                            type: JUnit
+                            spec:
+                              paths:
+                                - "**/*.xml"
+                          outputVariables:
+                            - name: version
+                            - name: release
+                            - name: commitHash
+                            - name: gitBranch
+                        when:
+                          stageStatus: Success
+                        failureStrategies: []
               - step:
                   type: BuildAndPushDockerRegistry
                   name: Build and Push an image to Docker Registry_1
