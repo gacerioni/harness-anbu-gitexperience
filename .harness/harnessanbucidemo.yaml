@@ -20,6 +20,7 @@ pipeline:
             enabled: true
             paths:
               - /root/.m2/repository
+              - /.m2/repository
           cloneCodebase: true
           platform:
             os: Linux
