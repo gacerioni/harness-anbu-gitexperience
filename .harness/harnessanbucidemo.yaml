@@ -178,6 +178,7 @@ pipeline:
                             - name: gitBranch
                         when:
                           stageStatus: Success
+                          condition: 1 == 0
                         failureStrategies: []
                     - step:
                         type: RunTests
