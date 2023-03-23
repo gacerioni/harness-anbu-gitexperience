@@ -86,6 +86,21 @@ pipeline:
                   failureStrategies: []
                   spec: {}
               - stepGroup:
+                  name: Caching Intelligence
+                  identifier: Caching_Intelligence
+                  steps:
+                    - step:
+                        type: Run
+                        name: caching-intelligence
+                        identifier: cachingintelligence
+                        spec:
+                          shell: Sh
+                          command: |-
+                            mkdir caching-intelligence
+                            cd caching-intelligence
+
+                            echo gabs > gabs.txt
+              - stepGroup:
                   name: Save Lab Cache
                   identifier: Save_Lab_Cache
                   steps:
