@@ -180,6 +180,45 @@ pipeline:
                           stageStatus: Success
                         failureStrategies: []
                     - step:
+                        type: RunTests
+                        name: Test and Build
+                        identifier: Tests_Build
+                        spec:
+                          language: Java
+                          buildTool: Maven
+                          args: clean test
+                          packages: com.gabsthecreator
+                          runOnlySelectedTests: true
+                          preCommand: |-
+                            export version="3.0.0"
+                            export release="$version"
+                            export commitHash=<+codebase.commitSha>
+                            export gitBranch=<+codebase.branch>
+                          postCommand: |-
+                            mvn package -DskipTests
+
+
+                            echo "printing current dir"
+                            pwd
+                            ls -ltra
+                            echo "Who am I at runtime"
+                            whoami
+
+                            ls -ltra /tmp/engine
+                          reports:
+                            type: JUnit
+                            spec:
+                              paths:
+                                - "**/*.xml"
+                          outputVariables:
+                            - name: version
+                            - name: release
+                            - name: commitHash
+                            - name: gitBranch
+                        when:
+                          stageStatus: Success
+                        failureStrategies: []
+                    - step:
                         type: Run
                         name: CIntelligence TEST AFTER BUILD
                         identifier: CIntelligence_TEST_AFTER_BUILD
