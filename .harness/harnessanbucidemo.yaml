@@ -108,8 +108,8 @@ pipeline:
                             tree
 
                             echo "PRINTING STUFF FROM MAVEN PROBABLE REPOS"
-                            ls -ltr /root/.m2/repository/*
-                            ls -ltr /.m2/repository/*
+                            ls -ltr /root/.m2/repository/* || true
+                            ls -ltr /.m2/repository/* || true
                     - step:
                         type: Run
                         name: caching-intelligence
