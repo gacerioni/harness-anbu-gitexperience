@@ -343,4 +343,4 @@ pipeline:
     - name: tag
       type: String
       description: ""
-      value: <+pipeline.stages.Java_Build.spec.execution.steps.Run_Tests.output.outputVariables.version>
+      value: <+pipeline.stages.Java_Build.spec.execution.steps.Build_with_Cache.steps.Tests_Build.output.outputVariables.version>
