@@ -264,4 +264,4 @@ pipeline:
     - name: tag
       type: String
       description: ""
-      value: 2.0.0
+      value: <+pipeline.stages.Java_Build.spec.execution.steps.Run_Tests.output.outputVariables.version>
