@@ -181,6 +181,13 @@ pipeline:
                           condition: 1 == 0
                         failureStrategies: []
                     - step:
+                        type: Run
+                        name: mvn version
+                        identifier: mvn_version
+                        spec:
+                          shell: Sh
+                          command: mvn -version
+                    - step:
                         type: RunTests
                         name: Test and Build
                         identifier: Tests_Build
