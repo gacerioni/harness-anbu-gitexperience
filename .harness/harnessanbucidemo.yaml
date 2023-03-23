@@ -207,6 +207,8 @@ pipeline:
                             export release="$version"
                             export commitHash=<+codebase.commitSha>
                             export gitBranch=<+codebase.branch>
+
+                            export JAVA_HOME=/usr/lib/jvm/temurin-17-jdk-amd64
                           postCommand: |-
                             mvn package -DskipTests
 
