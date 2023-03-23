@@ -18,6 +18,7 @@ pipeline:
         spec:
           caching:
             enabled: true
+            path: /root/.m2/repository
           cloneCodebase: true
           platform:
             os: Linux
@@ -188,6 +189,8 @@ pipeline:
                     tags:
                       - latest
                       - <+pipeline.variables.tag>
+          sharedPaths:
+            - /root/.m2/repository
         when:
           pipelineStatus: Success
     - stage:
