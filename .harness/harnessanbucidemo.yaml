@@ -21,6 +21,7 @@ pipeline:
             paths:
               - /root/.m2/repository
               - /.m2/repository
+              - /harness/caching-intelligence
           cloneCodebase: true
           platform:
             os: Linux
