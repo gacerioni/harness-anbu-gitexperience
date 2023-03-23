@@ -184,6 +184,13 @@ pipeline:
                   identifier: Restore_Lab_Cache
                   steps:
                     - step:
+                        type: Run
+                        name: tree before
+                        identifier: tree_before
+                        spec:
+                          shell: Sh
+                          command: tree
+                    - step:
                         type: RestoreCacheS3
                         name: Restore
                         identifier: Restore
@@ -193,6 +200,22 @@ pipeline:
                           bucket: gacerioni-bucket
                           key: savelabfolder
                           archiveFormat: Tar
+                    - step:
+                        type: Run
+                        name: tree after
+                        identifier: tree_after
+                        spec:
+                          shell: Sh
+                          command: tree
+                    - step:
+                        type: Run
+                        name: tree after in container
+                        identifier: tree_after_in_container
+                        spec:
+                          connectorRef: account.harnessImage
+                          image: busybox
+                          shell: Sh
+                          command: tree
               - step:
                   type: Background
                   name: Start and expose the APP
