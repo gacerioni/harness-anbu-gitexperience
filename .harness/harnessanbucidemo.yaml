@@ -196,7 +196,6 @@ pipeline:
 
                             echo "PRINTING STUFF FROM MAVEN PROBABLE REPOS"
                             ls -ltr /root/.m2/repository/*
-                            ls -ltr /.m2/repository/*
                     - step:
                         type: SaveCacheS3
                         name: Save Maven Repo
