@@ -91,6 +91,16 @@ pipeline:
                   steps:
                     - step:
                         type: Run
+                        name: check dir
+                        identifier: check_dir
+                        spec:
+                          shell: Sh
+                          command: |-
+                            pwd
+                            ls -ltr ./*
+                            pwd
+                    - step:
+                        type: Run
                         name: caching-intelligence
                         identifier: cachingintelligence
                         spec:
