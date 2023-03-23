@@ -95,16 +95,21 @@ pipeline:
                   steps:
                     - step:
                         type: Run
-                        name: check dir
+                        name: CIntelligence TEST BEFORE
                         identifier: check_dir
                         spec:
                           shell: Sh
                           command: |-
+                            echo "PRINTING HOME STUFF FROM /harness"
                             pwd
                             echo ""
                             ls -ltr ./*
                             echo ""
                             tree
+
+                            echo "PRINTING STUFF FROM MAVEN PROBABLE REPOS"
+                            ls -ltr /root/.m2/repository/*
+                            ls -ltr /.m2/repository/*
                     - step:
                         type: Run
                         name: caching-intelligence
@@ -159,7 +164,7 @@ pipeline:
                           archiveFormat: Tar
                         when:
                           stageStatus: Success
-                          condition: 1 == 1
+                          condition: 1 == 0
                         failureStrategies: []
                     - step:
                         type: RunTests
@@ -203,6 +208,23 @@ pipeline:
                           stageStatus: Success
                         failureStrategies: []
                     - step:
+                        type: Run
+                        name: CIntelligence TEST AFTER BUILD
+                        identifier: CIntelligence_TEST_AFTER_BUILD
+                        spec:
+                          shell: Sh
+                          command: |-
+                            echo "PRINTING HOME STUFF FROM /harness"
+                            pwd
+                            echo ""
+                            ls -ltr ./*
+                            echo ""
+                            tree
+
+                            echo "PRINTING STUFF FROM MAVEN PROBABLE REPOS"
+                            ls -ltr /root/.m2/repository/*
+                            ls -ltr /.m2/repository/*
+                    - step:
                         type: SaveCacheS3
                         name: Save Maven Repo
                         identifier: Save_Maven_Repo
@@ -217,7 +239,7 @@ pipeline:
                           archiveFormat: Tar
                         when:
                           stageStatus: Success
-                          condition: 1 == 1
+                          condition: 1 == 0
                         failureStrategies: []
               - step:
                   type: BuildAndPushDockerRegistry
