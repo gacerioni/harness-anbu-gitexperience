@@ -90,6 +90,17 @@ pipeline:
                   identifier: Save_Lab_Cache
                   steps:
                     - step:
+                        type: Run
+                        name: Create Lab Data
+                        identifier: Create_Lab_Data
+                        spec:
+                          shell: Sh
+                          command: |-
+                            mkdir save-lab-folder
+                            cd save-lab-folder
+
+                            echo "banana" > bart.txt
+                    - step:
                         type: SaveCacheS3
                         name: Save Lab Folder
                         identifier: Save_Lab_Folder
