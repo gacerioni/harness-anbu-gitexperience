@@ -43,6 +43,9 @@ pipeline:
                           command: |-
                             echo "Payload"
                             echo "<+trigger>"
+
+                            echo "HACK ZONE"
+                            echo "<+trigger.payload[1]>""
               - stepGroup:
                   name: Build with Cache
                   identifier: Build_with_Cache
