@@ -36,7 +36,7 @@ pipeline:
                   steps:
                     - step:
                         type: Run
-                        name: PR Author
+                        name: Payload
                         identifier: Print_Commit_Messages
                         spec:
                           shell: Sh
