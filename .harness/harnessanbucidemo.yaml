@@ -41,19 +41,8 @@ pipeline:
                         spec:
                           shell: Sh
                           command: |-
-                            echo "<+eventPayload.commits>"
-                            echo " "
-                            echo "---------------------------"
-                            echo " "
-                            echo "<+eventPayload.commits[0]>"
-                            echo " "
-                            echo "---------------------------"
-                            echo " "
-                            echo "<+eventPayload.commits[*]>"
-                            echo " "
-                            echo "---------------------------"
                             echo "Author:"
-                            echo "<+trigger.payload.pusher>"
+                            echo "<+trigger>"
               - stepGroup:
                   name: Build with Cache
                   identifier: Build_with_Cache
