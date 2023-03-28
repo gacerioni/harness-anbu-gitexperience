@@ -41,8 +41,8 @@ pipeline:
                         spec:
                           shell: Sh
                           command: |-
-                            echo "PR Author:"
-                            echo "<+trigger.payload.sender.login>"
+                            echo "Payload"
+                            echo "<+trigger>"
               - stepGroup:
                   name: Build with Cache
                   identifier: Build_with_Cache
