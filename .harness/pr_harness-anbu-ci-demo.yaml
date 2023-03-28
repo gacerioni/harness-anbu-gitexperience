@@ -1,0 +1,18 @@
+inputSet:
+  name: PR InputSet
+  identifier: PR_InputSet
+  orgIdentifier: default
+  projectIdentifier: default_project
+  pipeline:
+    identifier: harnessanbucidemo
+    properties:
+      ci:
+        codebase:
+          build:
+            type: PR
+            spec:
+              number: <+trigger.prNumber>
+    variables:
+      - name: DockerHub_User
+        type: String
+        value: gacerioni
