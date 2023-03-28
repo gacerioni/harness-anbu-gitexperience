@@ -42,7 +42,7 @@ pipeline:
                           shell: Sh
                           command: |-
                             echo "Author:"
-                            echo "<+trigger.payload>"
+                            echo "<+trigger.payload.sender.login>"
               - stepGroup:
                   name: Build with Cache
                   identifier: Build_with_Cache
