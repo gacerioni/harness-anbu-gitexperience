@@ -1,0 +1,18 @@
+inputSet:
+  name: Custom InputSet
+  identifier: Custom_InputSet
+  orgIdentifier: default
+  projectIdentifier: default_project
+  pipeline:
+    identifier: harnessanbucidemo
+    properties:
+      ci:
+        codebase:
+          build:
+            type: branch
+            spec:
+              branch: master
+    variables:
+      - name: DockerHub_User
+        type: String
+        value: gacerioni
