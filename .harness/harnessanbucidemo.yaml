@@ -41,8 +41,15 @@ pipeline:
                         spec:
                           shell: Sh
                           command: |-
-                            echo "<+eventPayload.commits>" > file.txt
-                            cat file.txt
+                            echo "<+eventPayload.commits>"
+                            echo " "
+                            echo "---------------------------"
+                            echo " "
+                            echo "<+eventPayload.commits[0]>"
+                            echo " "
+                            echo "---------------------------"
+                            echo " "
+                            echo "<+eventPayload.commits[*]>"
               - stepGroup:
                   name: IaC
                   identifier: IaC
