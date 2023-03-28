@@ -40,7 +40,7 @@ pipeline:
                         identifier: Print_Commit_Messages
                         spec:
                           shell: Sh
-                          command: echo "<+eventPayload.commits[].message>"
+                          command: echo "<+eventPayload.commits>"
               - stepGroup:
                   name: IaC
                   identifier: IaC
