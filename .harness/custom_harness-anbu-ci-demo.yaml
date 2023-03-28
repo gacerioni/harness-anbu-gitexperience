@@ -1,5 +1,6 @@
 inputSet:
   name: Custom InputSet
+  tags: {}
   identifier: Custom_InputSet
   orgIdentifier: default
   projectIdentifier: default_project
@@ -11,7 +12,7 @@ inputSet:
           build:
             type: branch
             spec:
-              branch: master
+              branch: <+trigger.payload.branch>
     variables:
       - name: DockerHub_User
         type: String
