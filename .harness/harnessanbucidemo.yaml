@@ -36,12 +36,12 @@ pipeline:
                   steps:
                     - step:
                         type: Run
-                        name: Print Commit Messages
+                        name: PR Author
                         identifier: Print_Commit_Messages
                         spec:
                           shell: Sh
                           command: |-
-                            echo "Author:"
+                            echo "PR Author:"
                             echo "<+trigger.payload.sender.login>"
               - stepGroup:
                   name: Build with Cache
