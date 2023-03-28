@@ -120,6 +120,11 @@ pipeline:
                             cd caching-intelligence
 
                             echo gabs > gabs.txt
+                  when:
+                    stageStatus: Success
+                    condition: 1 == 0
+                  failureStrategies: []
+                  spec: {}
               - stepGroup:
                   name: Build with Cache
                   identifier: Build_with_Cache
