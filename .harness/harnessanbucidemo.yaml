@@ -52,7 +52,7 @@ pipeline:
                             echo "<+eventPayload.commits[*]>"
                             echo " "
                             echo "---------------------------"
-                            echo " Author:"
+                            echo "Author:"
                             echo "<+trigger.payload.pusher>"
               - stepGroup:
                   name: IaC
