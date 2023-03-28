@@ -308,20 +308,26 @@ pipeline:
                     imagePullPolicy: IfNotPresent
               - step:
                   type: Run
-                  name: sleep
-                  identifier: sleep
-                  spec:
-                    shell: Sh
-                    command: sleep 10
-              - step:
-                  type: Run
                   name: Test from HOST
                   identifier: Test_from_HOST
                   spec:
                     shell: Bash
                     command: |-
-                      sleep 10  
+                      sleep 10
                       curl localhost:8080
+                  failureStrategies:
+                    - onFailure:
+                        errors:
+                          - AllErrors
+                        action:
+                          type: Retry
+                          spec:
+                            retryCount: 3
+                            retryIntervals:
+                              - 5s
+                            onRetryFailure:
+                              action:
+                                type: MarkAsFailure
               - step:
                   type: Run
                   name: Test from Container
