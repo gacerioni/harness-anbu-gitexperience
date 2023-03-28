@@ -31,6 +31,17 @@ pipeline:
           execution:
             steps:
               - stepGroup:
+                  name: Print Trigger Stuff
+                  identifier: Print_Trigger_Stuff
+                  steps:
+                    - step:
+                        type: Run
+                        name: Print Commit Messages
+                        identifier: Print_Commit_Messages
+                        spec:
+                          shell: Sh
+                          command: echo "<+eventPayload.commits[].message>"
+              - stepGroup:
                   name: IaC
                   identifier: IaC
                   steps:
