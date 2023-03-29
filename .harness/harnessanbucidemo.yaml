@@ -51,20 +51,6 @@ pipeline:
                   identifier: Build_with_Cache
                   steps:
                     - step:
-                        type: RestoreCacheS3
-                        name: Restore Maven Repo
-                        identifier: Restore_Maven_Repo
-                        spec:
-                          connectorRef: AWS
-                          region: us-east-1
-                          bucket: gacerioni-bucket
-                          key: mavenrepo
-                          archiveFormat: Tar
-                        when:
-                          stageStatus: Success
-                          condition: 1 == 0
-                        failureStrategies: []
-                    - step:
                         type: RunTests
                         name: Run and Build
                         identifier: Run_Tests
@@ -175,23 +161,6 @@ pipeline:
 
                             echo "PRINTING STUFF FROM MAVEN PROBABLE REPOS"
                             ls -ltr /root/.m2/repository/*
-                    - step:
-                        type: SaveCacheS3
-                        name: Save Maven Repo
-                        identifier: Save_Maven_Repo
-                        spec:
-                          connectorRef: AWS
-                          region: us-east-1
-                          bucket: gacerioni-bucket
-                          key: mavenrepo
-                          sourcePaths:
-                            - /root/.m2/repository
-                            - /.m2/repository
-                          archiveFormat: Tar
-                        when:
-                          stageStatus: Success
-                          condition: 1 == 0
-                        failureStrategies: []
               - step:
                   type: BuildAndPushDockerRegistry
                   name: Build and Push an image to Docker Registry_1
