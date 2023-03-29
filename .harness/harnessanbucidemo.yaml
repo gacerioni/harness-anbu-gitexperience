@@ -52,20 +52,20 @@ pipeline:
                   spec:
                     shell: Sh
                     command: |-
-                      #curl -i \
-                      #  -X POST \
-                      #  -H "Authorization: Bearer <+secrets.getValue('account.Github_Access_Token')>" \
-                      #  -H "Accept: application/vnd.github.v3+json" \
-                      #  https://api.github.com/repos/<YOUR_ORGANIZATION>/<+pipeline.properties.ci.codebase.repoName>/statuses/<+codebase.commitSha> \
-                      #  -d '{"state":"pending","target_url":"<+pipeline.execution.url>","description":"Test is running","context":"harness-ci/tests"}'
+                      curl -i \
+                        -X POST \
+                        -H "Authorization: Bearer <+secrets.getValue('account.Github_Access_Token')>" \
+                        -H "Accept: application/vnd.github.v3+json" \
+                        https://api.github.com/repos/<+pipeline.properties.ci.codebase.repoName>/statuses/<+codebase.commitSha> \
+                        -d '{"state":"pending","target_url":"<+pipeline.execution.url>","description":"Test is running","context":"harness-ci/tests"}'
 
-                      echo "###################################"
-                      echo "<+pipeline.properties.ci.codebase.repoName>"
-                      echo "-----------------------------------"
-                      echo "<+codebase.commitSha>"
-                      echo "-----------------------------------"
-                      echo "<+pipeline.execution.url>"
-                      echo "###################################"
+                      #echo "###################################"
+                      #echo "<+pipeline.properties.ci.codebase.repoName>"
+                      #echo "-----------------------------------"
+                      #echo "<+codebase.commitSha>"
+                      #echo "-----------------------------------"
+                      #echo "<+pipeline.execution.url>"
+                      #echo "###################################"
               - stepGroup:
                   name: Build with Cache
                   identifier: Build_with_Cache
