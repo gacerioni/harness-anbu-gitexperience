@@ -1,0 +1,528 @@
+template:
+  name: ECS CI CD Demo
+  type: Pipeline
+  projectIdentifier: ECS_CI_CD
+  orgIdentifier: default
+  spec:
+    properties:
+      ci:
+        codebase:
+          connectorRef: account.Github
+          repoName: gacerioni/harness-srm-demo
+          build: <+input>
+    stages:
+      - stage:
+          name: Java Build
+          identifier: Java_Build
+          type: CI
+          spec:
+            caching:
+              enabled: true
+              paths:
+                - /root/.m2/repository
+            cloneCodebase: true
+            platform:
+              os: Linux
+              arch: Amd64
+            runtime:
+              type: Cloud
+              spec: {}
+            execution:
+              steps:
+                - stepGroup:
+                    name: Print Trigger Stuff
+                    identifier: Print_Trigger_Stuff
+                    steps:
+                      - step:
+                          type: Run
+                          name: Payload
+                          identifier: Print_Commit_Messages
+                          spec:
+                            shell: Sh
+                            command: |-
+                              echo "Payload"
+                              echo "<+trigger>"
+
+                              echo "HACK ZONE"
+                              echo "<+trigger.payload[1]>"
+                - step:
+                    type: Run
+                    name: Notify GH Commit Status - Start
+                    identifier: Notify_GH_Commit_Status
+                    spec:
+                      shell: Sh
+                      command: |-
+                        curl -i \
+                          -X POST \
+                          -H "Authorization: Bearer <+secrets.getValue('account.Github_Access_Token')>" \
+                          -H "Accept: application/vnd.github.v3+json" \
+                          https://api.github.com/repos/<+pipeline.properties.ci.codebase.repoName>/statuses/<+codebase.commitSha> \
+                          -d '{"state":"pending","target_url":"<+pipeline.execution.url>","description":"CI Stage is starting","context":"harness-ci/tests"}'
+
+                        #echo "###################################"
+                        #echo "<+pipeline.properties.ci.codebase.repoName>"
+                        #echo "-----------------------------------"
+                        #echo "<+codebase.commitSha>"
+                        #echo "-----------------------------------"
+                        #echo "<+pipeline.execution.url>"
+                        #echo "###################################"
+                - stepGroup:
+                    name: Build with Cache
+                    identifier: Build_with_Cache
+                    steps:
+                      - step:
+                          type: Run
+                          name: mvn version
+                          identifier: mvn_version
+                          spec:
+                            shell: Sh
+                            command: |-
+                              mvn -version
+
+                              echo ""
+
+                              env | grep JAVA
+                      - step:
+                          type: RunTests
+                          name: Test and Build
+                          identifier: Tests_Build
+                          spec:
+                            language: Java
+                            buildTool: Maven
+                            args: clean test
+                            packages: com.gabsthecreator
+                            runOnlySelectedTests: true
+                            preCommand: |-
+                              version=`mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout`
+                              release="$version"
+                              commitHash=<+codebase.commitSha>
+                              gitBranch=<+codebase.branch>
+
+                              export JAVA_HOME=/usr/lib/jvm/temurin-17-jdk-amd64
+                            postCommand: |-
+                              mvn package -DskipTests
+
+
+                              echo "printing current dir"
+                              pwd
+                              ls -ltra
+                              echo "Who am I at runtime"
+                              whoami
+
+                              ls -ltra /tmp/engine
+                            reports:
+                              type: JUnit
+                              spec:
+                                paths:
+                                  - "**/*.xml"
+                            outputVariables:
+                              - name: version
+                              - name: release
+                              - name: commitHash
+                              - name: gitBranch
+                          when:
+                            stageStatus: Success
+                          failureStrategies: []
+                - step:
+                    type: BuildAndPushDockerRegistry
+                    name: Build and Push an image to Docker Registry_1
+                    identifier: BuildandPushanimagetoDockerRegistry_1
+                    spec:
+                      connectorRef: DockerHub_Gabs_Demo
+                      repo: <+pipeline.variables.DockerHub_User>/<+pipeline.variables.DockerHub_Repo>
+                      tags:
+                        - latest
+                        - <+pipeline.variables.tag>
+                - step:
+                    type: Run
+                    name: Notify GH Commit Status - End
+                    identifier: Notify_GH_Commit_Status_End
+                    spec:
+                      shell: Sh
+                      command: |
+                        curl -i \
+                          -X POST \
+                          -H "Authorization: Bearer <+secrets.getValue('account.Github_Access_Token')>" \
+                          -H "Accept: application/vnd.github.v3+json" \
+                          https://api.github.com/repos/<+pipeline.properties.ci.codebase.repoName>/statuses/<+codebase.commitSha> \
+                          -d '{"state":"success","target_url":"<+pipeline.execution.url>","description":"CI Stage is complete","context":"harness-ci/tests"}'
+            sharedPaths:
+              - /root/.m2/repository
+              - /.m2/repository
+          when:
+            pipelineStatus: Success
+      - stage:
+          name: Integration Tests
+          identifier: Integration_Tests
+          type: CI
+          spec:
+            cloneCodebase: false
+            platform:
+              os: Linux
+              arch: Amd64
+            runtime:
+              type: Cloud
+              spec: {}
+            execution:
+              steps:
+                - step:
+                    type: Background
+                    name: Start and expose the APP
+                    identifier: myappservice
+                    spec:
+                      connectorRef: account.harnessImage
+                      image: <+pipeline.variables.DockerHub_User>/<+pipeline.variables.DockerHub_Repo>:<+pipeline.variables.tag>
+                      shell: Sh
+                      portBindings:
+                        "8080": "8080"
+                      imagePullPolicy: IfNotPresent
+                - parallel:
+                    - step:
+                        type: Run
+                        name: Test from HOST
+                        identifier: Test_from_HOST
+                        spec:
+                          shell: Bash
+                          command: |-
+                            sleep 10
+                            curl localhost:8080
+                        failureStrategies:
+                          - onFailure:
+                              errors:
+                                - AllErrors
+                              action:
+                                type: Retry
+                                spec:
+                                  retryCount: 3
+                                  retryIntervals:
+                                    - 5s
+                                  onRetryFailure:
+                                    action:
+                                      type: MarkAsSuccess
+                    - step:
+                        type: Run
+                        name: Test from Container
+                        identifier: Test_from_Container
+                        spec:
+                          connectorRef: account.harnessImage
+                          image: yauritux/busybox-curl
+                          shell: Sh
+                          command: curl -i http://myappservice:8080
+                        failureStrategies:
+                          - onFailure:
+                              errors:
+                                - AllErrors
+                              action:
+                                type: Retry
+                                spec:
+                                  retryCount: 3
+                                  retryIntervals:
+                                    - 10s
+                                  onRetryFailure:
+                                    action:
+                                      type: MarkAsSuccess
+                - step:
+                    type: Run
+                    name: Test clients
+                    identifier: Test_clients
+                    spec:
+                      shell: Sh
+                      command: "echo \"BROWSER: <+matrix.browser>\"\r\necho \"PLATFORM: <+matrix.platform>\""
+                    failureStrategies: []
+                    strategy:
+                      matrix:
+                        browser:
+                          - chrome
+                          - firefox
+                          - safari
+                        platform:
+                          - linux
+                          - mac
+                        exclude:
+                          - browser: safari
+                            platform: linux
+                        maxConcurrency: 2
+      - stage:
+          name: Approve Deployment
+          identifier: Approve_Deployment
+          description: ""
+          type: Approval
+          spec:
+            execution:
+              steps:
+                - step:
+                    name: Can I Deploy
+                    identifier: Can_I_Deploy
+                    type: HarnessApproval
+                    timeout: 1d
+                    spec:
+                      approvalMessage: |-
+                        Please review the following information
+                        and approve the pipeline progression
+                      includePipelineExecutionHistory: true
+                      approvers:
+                        minimumCount: 1
+                        disallowPipelineExecutor: false
+                        userGroups:
+                          - account.Anbu
+                      approverInputs: []
+          tags: {}
+      - stage:
+          name: Deploy to DEV
+          identifier: Deploy_to_DEV
+          description: ""
+          type: Deployment
+          spec:
+            deploymentType: ECS
+            service:
+              serviceRef: ECS_Tutorial
+              serviceInputs:
+                serviceDefinition:
+                  type: ECS
+                  spec:
+                    artifacts:
+                      primary:
+                        primaryArtifactRef: gabsregistry
+                        sources:
+                          - identifier: gabsregistry
+                            type: DockerRegistry
+                            spec:
+                              tag: <+pipeline.stages.Java_Build.spec.execution.steps.Build_with_Cache.steps.Tests_Build.output.outputVariables.release>
+            environment:
+              environmentRef: DEV
+              deployToAll: false
+              infrastructureDefinitions:
+                - identifier: ecstempgabs
+            execution:
+              steps:
+                - stepGroup:
+                    name: ITSM
+                    identifier: ITSM
+                    steps:
+                      - step:
+                          type: JiraCreate
+                          name: Create Ticket
+                          identifier: Create_Ticket
+                          spec:
+                            connectorRef: account.JiraGabs
+                            projectKey: HD
+                            issueType: Change
+                            fields:
+                              - name: Comment
+                                value: This is being managed by Harness ITSM capabilities
+                              - name: Description
+                                value: "Anbu - A new release is on the way! Version: <+artifacts.primary.tag>"
+                              - name: Summary
+                                value: Anbu - Demo Change Request
+                          timeout: 10m
+                - stepGroup:
+                    name: Canary Deployment
+                    identifier: canaryDepoyment
+                    steps:
+                      - step:
+                          type: JiraUpdate
+                          name: Update Canary Ticket
+                          identifier: Update_Canary_Ticket
+                          spec:
+                            connectorRef: account.JiraGabs
+                            issueKey: <+pipeline.stages.Deploy_to_DEV.spec.execution.steps.ITSM.steps.Create_Ticket.issue.key>
+                            transitionTo:
+                              transitionName: ""
+                              status: In Progress
+                            fields:
+                              - name: Comment
+                                value: Canary Deployment in <+env.name> has started!
+                          timeout: 10m
+                      - step:
+                          name: ECS Canary Deploy
+                          identifier: ecsCanaryDeploy
+                          type: EcsCanaryDeploy
+                          timeout: 10m
+                          spec: {}
+                      - step:
+                          name: ECS Canary Delete
+                          identifier: ecsCanaryDelete
+                          type: EcsCanaryDelete
+                          timeout: 10m
+                          spec: {}
+                    when:
+                      stageStatus: Success
+                      condition: 1 == 0
+                    failureStrategies: []
+                    spec: {}
+                - stepGroup:
+                    name: Primary Deployment
+                    identifier: primaryDepoyment
+                    steps:
+                      - parallel:
+                          - step:
+                              name: ECS Rolling Deploy
+                              identifier: ecsRollingDeploy
+                              type: EcsRollingDeploy
+                              timeout: 30m
+                              spec:
+                                sameAsAlreadyRunningInstances: false
+                                forceNewDeployment: false
+                          - step:
+                              type: JiraUpdate
+                              name: ITSM - Rolling Deployment
+                              identifier: ITSM_Rolling_Deployment
+                              spec:
+                                connectorRef: account.JiraGabs
+                                issueKey: <+pipeline.stages.Deploy_to_DEV.spec.execution.steps.ITSM.steps.Create_Ticket.issue.key>
+                                transitionTo:
+                                  transitionName: ""
+                                  status: In Progress
+                                fields:
+                                  - name: Comment
+                                    value: "Canary was approved! Doing a Rolling Deployment. "
+                              timeout: 10m
+                - step:
+                    type: ShellScript
+                    name: Helper - ALB
+                    identifier: Helper_ALB
+                    spec:
+                      shell: Bash
+                      onDelegate: true
+                      source:
+                        type: Inline
+                        spec:
+                          script: echo "gabs-ecs-demo-alb-645523416.sa-east-1.elb.amazonaws.com"
+                      environmentVariables: []
+                      outputVariables: []
+                    timeout: 10m
+              rollbackSteps:
+                - step:
+                    name: ECS Canary Delete
+                    identifier: ecsRollbackCanaryDelete
+                    type: EcsCanaryDelete
+                    timeout: 10m
+                    spec: {}
+                - step:
+                    name: ECS Rolling Rollback
+                    identifier: ecsRollingRollback
+                    type: EcsRollingRollback
+                    timeout: 10m
+                    spec: {}
+          tags: {}
+          failureStrategies:
+            - onFailure:
+                errors:
+                  - AllErrors
+                action:
+                  type: StageRollback
+      - stage:
+          name: Deploy to PRD
+          identifier: Deploy_to_PRD
+          description: ""
+          type: Deployment
+          spec:
+            deploymentType: ECS
+            service:
+              useFromStage:
+                stage: Deploy_to_DEV
+            environment:
+              environmentRef: PRD
+              deployToAll: false
+              infrastructureDefinitions:
+                - identifier: ecsprd
+            execution:
+              steps:
+                - step:
+                    type: JiraApproval
+                    name: Approve Deploy to PRD
+                    identifier: Approve_Deploy_to_PRD
+                    spec:
+                      connectorRef: account.JiraGabs
+                      projectKey: HD
+                      issueType: Change
+                      issueKey: <+pipeline.stages.Deploy_to_DEV.spec.execution.steps.ITSM.steps.Create_Ticket.issue.key>
+                      approvalCriteria:
+                        type: KeyValues
+                        spec:
+                          matchAnyCondition: true
+                          conditions:
+                            - key: Status
+                              operator: equals
+                              value: Approved
+                      rejectionCriteria:
+                        type: KeyValues
+                        spec:
+                          matchAnyCondition: true
+                          conditions:
+                            - key: Status
+                              operator: in
+                              value: Blocked,Will Not Fix,Invalid,Rejected
+                    timeout: 1d
+                - step:
+                    type: ShellScript
+                    name: Custom Deployment
+                    identifier: Custom_Deployment
+                    spec:
+                      shell: Bash
+                      onDelegate: true
+                      source:
+                        type: Inline
+                        spec:
+                          script: echo 1
+                      environmentVariables: []
+                      outputVariables: []
+                    timeout: 10m
+                - step:
+                    type: JiraUpdate
+                    name: ITSM - Close Ticket
+                    identifier: ITSM_Close_Ticket
+                    spec:
+                      connectorRef: account.JiraGabs
+                      issueKey: <+pipeline.stages.Deploy_to_DEV.spec.execution.steps.ITSM.steps.Create_Ticket.issue.key>
+                      transitionTo:
+                        transitionName: ""
+                        status: Done
+                      fields:
+                        - name: Comment
+                          value: Deployment was successful! Closing the Change Request ticket.
+                    timeout: 10m
+              rollbackSteps:
+                - step:
+                    name: ECS Rolling Rollback
+                    identifier: ecsRollingRollback
+                    type: EcsRollingRollback
+                    timeout: 10m
+                    spec: {}
+          tags: {}
+          failureStrategies:
+            - onFailure:
+                errors:
+                  - AllErrors
+                action:
+                  type: StageRollback
+    variables:
+      - name: DockerHub_User
+        type: String
+        description: ""
+        value: <+input>
+      - name: DockerHub_Repo
+        type: String
+        description: ""
+        value: harness-anbu-demo
+      - name: tag
+        type: String
+        description: ""
+        value: <+pipeline.stages.Java_Build.spec.execution.steps.Build_with_Cache.steps.Tests_Build.output.outputVariables.version>
+    notificationRules:
+      - name: Let me know
+        identifier: Let_me_know
+        pipelineEvents:
+          - type: PipelineStart
+          - type: PipelineEnd
+          - type: PipelinePaused
+        notificationMethod:
+          type: Slack
+          spec:
+            userGroups:
+              - account.Anbu
+            webhookUrl: ""
+        enabled: true
+  identifier: ECS_CI_CD_Demo
+  versionLabel: v1
+  icon: data:image/png;base64,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
