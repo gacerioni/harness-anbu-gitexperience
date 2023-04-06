@@ -296,6 +296,7 @@ pipeline:
                         timeout: 1d
                         when:
                           stageStatus: Success
+                          condition: 1 == 0
                         failureStrategies: []
                     - step:
                         type: K8sCanaryDeploy
@@ -414,6 +415,9 @@ pipeline:
                                     - AllErrors
                                   action:
                                     type: MarkAsFailure
+                            when:
+                              stageStatus: Success
+                              condition: 1 == 0
             rollbackSteps:
               - step:
                   type: JiraUpdate
