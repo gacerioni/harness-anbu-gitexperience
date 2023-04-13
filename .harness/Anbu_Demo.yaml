@@ -141,17 +141,6 @@ pipeline:
                           - latest
                           - <+pipeline.variables.tag>
                         optimize: true
-              - step:
-                  type: BuildAndPushGCR
-                  name: Post
-                  identifier: Post
-                  spec:
-                    connectorRef: account.gcpsales
-                    host: us.gcr.io
-                    projectID: asdsfa
-                    imageName: fasfsafa
-                    tags:
-                      - fasfsaf
           sharedPaths:
             - /var/run
         when:
