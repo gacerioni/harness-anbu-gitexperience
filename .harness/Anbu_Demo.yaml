@@ -83,6 +83,8 @@ pipeline:
                     imagePullPolicy: IfNotPresent
                   description: We already build to run the tests.
                   failureStrategies: []
+                  strategy:
+                    parallelism: 1
               - stepGroup:
                   name: STO
                   identifier: STO
