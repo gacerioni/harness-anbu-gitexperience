@@ -25,6 +25,24 @@ pipeline:
           execution:
             steps:
               - step:
+                  type: Run
+                  name: Input Payload
+                  identifier: Input_Payload
+                  spec:
+                    connectorRef: account.Gabs_DockerHub_Registry
+                    image: busybox
+                    shell: Sh
+                    command: |-
+                      echo "This is the Event Payload variable content at runtime:"
+                      echo "<+eventPayload>"
+
+                      echo ""
+
+                      echo "This is the Trigger Payload variable content at runtime:"
+                      echo "<+trigger.payload>"
+
+                      echo "END!" 
+              - step:
                   type: RestoreCacheGCS
                   name: Restore Cache
                   identifier: Restore_Cache
