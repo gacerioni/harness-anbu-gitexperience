@@ -37,6 +37,8 @@ pipeline:
                     stageStatus: Success
                   failureStrategies: []
               - step:
+                  enableTestSplitting: true
+                  testSplitStrategy: ClassTiming
                   type: RunTests
                   name: Build and Unit Test
                   identifier: Build_and_Unit_Test
