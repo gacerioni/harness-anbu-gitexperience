@@ -1,0 +1,253 @@
+template:
+  name: Konr
+  type: Pipeline
+  projectIdentifier: Gabs_Labs
+  orgIdentifier: default
+  spec:
+    properties:
+      ci:
+        codebase:
+          connectorRef: account.Github
+          repoName: gacerioni/harness-srm-demo
+          build: <+input>
+    stages:
+      - stage:
+          name: Build me ASAP
+          identifier: Build_me_ASAP
+          type: CI
+          spec:
+            cloneCodebase: true
+            platform:
+              os: Linux
+              arch: Amd64
+            runtime:
+              type: Cloud
+              spec: {}
+            execution:
+              steps:
+                - step:
+                    type: Run
+                    name: Print meta
+                    identifier: Print_meta
+                    spec:
+                      shell: Sh
+                      command: |-
+                        echo "This is the codebase branch from the CI Stage that clones the repo:"
+                        echo "<+codebase.branch>"
+                        echo ""
+
+                        echo "This is the trigger branch from the CI Stage that clones the repo:"
+                        echo "<+trigger.branch>"
+                        echo ""
+
+                        echo "This is the trigger payload branch (custom payload) from the CI Stage that clones the repo:"
+                        echo "<+trigger.payload.branch>"
+
+                        echo "This is the end hold ur breath and count to 10."
+      - stage:
+          name: CI - I also clone codebase
+          identifier: Another_CI_Stage
+          type: CI
+          spec:
+            cloneCodebase: true
+            platform:
+              os: Linux
+              arch: Amd64
+            runtime:
+              type: Cloud
+              spec: {}
+            execution:
+              steps:
+                - step:
+                    type: Run
+                    name: Print meta
+                    identifier: Print_meta
+                    spec:
+                      shell: Sh
+                      command: |-
+                        echo "This is the codebase branch from another CI Stage that also clones the repo:"
+                        echo "<+codebase.branch>"
+                        echo ""
+
+                        echo "This is the trigger branch from the another Stage that also clones the repo:"
+                        echo "<+trigger.branch>"
+                        echo ""
+
+                        echo "This is the trigger payload branch (custom payload) from another CI Stage that also clones the repo:"
+                        echo "<+trigger.payload.branch>"
+
+                        echo "This is the end hold ur breath and count to 10."
+      - stage:
+          name: CI - I dont touch codebase
+          identifier: CI_I_dont_touch_codebase
+          description: ""
+          type: CI
+          spec:
+            cloneCodebase: false
+            platform:
+              os: Linux
+              arch: Amd64
+            runtime:
+              type: Cloud
+              spec: {}
+            execution:
+              steps:
+                - step:
+                    type: Run
+                    name: Print Meta
+                    identifier: Print_Meta
+                    spec:
+                      shell: Sh
+                      command: |-
+                        echo "This is the codebase branch from a CI Stage that DOES NOT clone the repo:"
+                        echo "<+codebase.branch>"
+                        echo ""
+
+                        echo "This is the trigger branch from the CI Stage that DOES NOT clone the repo:"
+                        echo "<+trigger.branch>"
+                        echo ""
+
+                        echo "This is the trigger payload branch (custom payload) from the CI Stage that DOES NOT clone the repo:"
+                        echo "<+trigger.payload.branch>"
+
+                        echo "This is the end hold ur breath and count to 10."
+      - stage:
+          name: I do a fake deployment
+          identifier: I_do_a_fake_deployment
+          description: ""
+          type: Deployment
+          spec:
+            deploymentType: Kubernetes
+            service:
+              serviceRef: anbudemo
+              serviceInputs:
+                serviceDefinition:
+                  type: Kubernetes
+                  spec:
+                    artifacts:
+                      primary:
+                        primaryArtifactRef: anbu-demo-springboot
+                        sources:
+                          - identifier: anbu-demo-springboot
+                            type: DockerRegistry
+                            spec:
+                              tag: 4.1.1
+            environment:
+              environmentRef: DEV
+              deployToAll: false
+              infrastructureDefinitions:
+                - identifier: gkeanbu
+            execution:
+              steps:
+                - step:
+                    type: ShellScript
+                    name: Print Meta
+                    identifier: Print_Meta
+                    spec:
+                      shell: Bash
+                      onDelegate: true
+                      source:
+                        type: Inline
+                        spec:
+                          script: |-
+                            echo "This is the codebase branch from a CD Stage:"
+                            echo "<+codebase.branch>"
+                            echo ""
+
+                            echo "This is the trigger branch from a CD Stage:"
+                            echo "<+trigger.branch>"
+                            echo ""
+
+                            echo "This is the trigger payload branch (custom payload) from a CD Stage:"
+                            echo "<+trigger.payload.branch>"
+
+                            echo "This is the end hold ur breath and count to 10."
+                      environmentVariables: []
+                      outputVariables: []
+                    timeout: 10m
+                    when:
+                      stageStatus: Success
+                    failureStrategies: []
+              rollbackSteps:
+                - step:
+                    name: Rollback Rollout Deployment
+                    identifier: rollbackRolloutDeployment
+                    type: K8sRollingRollback
+                    timeout: 10m
+                    spec:
+                      pruningEnabled: false
+          tags: {}
+          failureStrategies:
+            - onFailure:
+                errors:
+                  - AllErrors
+                action:
+                  type: StageRollback
+          when:
+            pipelineStatus: Success
+            condition: <+codebase.branch> == "banana"
+      - stage:
+          name: Another one
+          identifier: Another_one
+          description: ""
+          type: Deployment
+          spec:
+            deploymentType: Kubernetes
+            service:
+              useFromStage:
+                stage: I_do_a_fake_deployment
+            environment:
+              environmentRef: <+input>
+              deployToAll: false
+              environmentInputs: <+input>
+              serviceOverrideInputs: <+input>
+              infrastructureDefinitions: <+input>
+            execution:
+              steps:
+                - step:
+                    type: ShellScript
+                    name: another
+                    identifier: another
+                    spec:
+                      shell: Bash
+                      onDelegate: true
+                      source:
+                        type: Inline
+                        spec:
+                          script: |-
+                            echo "This is the codebase branch from a CD Stage:"
+                            echo "<+codebase.branch>"
+                            echo ""
+
+                            echo "This is the trigger branch from a CD Stage:"
+                            echo "<+trigger.branch>"
+                            echo ""
+
+                            echo "This is the trigger payload branch (custom payload) from a CD Stage:"
+                            echo "<+trigger.payload.branch>"
+
+                            echo "This is the end hold ur breath and count to 10."
+                      environmentVariables: []
+                      outputVariables: []
+                    timeout: 10m
+              rollbackSteps:
+                - step:
+                    name: Rollback Rollout Deployment
+                    identifier: rollbackRolloutDeployment
+                    type: K8sRollingRollback
+                    timeout: 10m
+                    spec:
+                      pruningEnabled: false
+          tags: {}
+          failureStrategies:
+            - onFailure:
+                errors:
+                  - AllErrors
+                action:
+                  type: StageRollback
+          when:
+            pipelineStatus: Success
+            condition: <+trigger.branch> == "main"
+    allowStageExecutions: true
+  identifier: Konr
+  versionLabel: v2
