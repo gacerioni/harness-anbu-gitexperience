@@ -490,6 +490,10 @@ pipeline:
       type: String
       description: ""
       value: <+pipeline.stages.Build_App.spec.execution.steps.Build_and_Unit_Test_0.output.outputVariables.version>
+    - name: FeatureFlags_SDK_Key
+      type: String
+      description: ""
+      value: a3e8fb02-a398-4972-a07d-4ff4f6f679b0
   flowControl:
     barriers:
       - name: barrier-gabs
