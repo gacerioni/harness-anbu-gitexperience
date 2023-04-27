@@ -494,6 +494,22 @@ pipeline:
       type: String
       description: ""
       value: a3e8fb02-a398-4972-a07d-4ff4f6f679b0
+    - name: github_source_user
+      type: String
+      description: ""
+      value: gacerioni
+    - name: github_source_repo
+      type: String
+      description: ""
+      value: harness-srm-demo
+    - name: dockerhub_artifact_user
+      type: String
+      description: ""
+      value: gacerioni
+    - name: dockerhub_artifact_repo
+      type: String
+      description: ""
+      value: harness-anbu-demo
   flowControl:
     barriers:
       - name: barrier-gabs
