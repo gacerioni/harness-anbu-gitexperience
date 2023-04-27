@@ -101,6 +101,9 @@ pipeline:
                       - name: commitHash
                       - name: gitBranch
                     imagePullPolicy: IfNotPresent
+                    resources:
+                      limits:
+                        memory: 1Gi
                   description: We already build to run the tests.
                   failureStrategies: []
                   strategy:
