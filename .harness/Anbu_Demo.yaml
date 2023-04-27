@@ -482,8 +482,8 @@ pipeline:
   properties:
     ci:
       codebase:
-        connectorRef: githubgabs
-        repoName: harness-srm-demo
+        connectorRef: account.Github
+        repoName: <+pipeline.variables.github_source_user>/<+pipeline.variables.github_source_repo>
         build: <+input>
   variables:
     - name: tag
